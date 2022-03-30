@@ -4,7 +4,7 @@ const {
     registerUser,
     loginUser,
     getMe,
-} = require("../controllers/userControlles");
+} = require("../controllers/userController");
 
 const router = Router();
 
