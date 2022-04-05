@@ -3,6 +3,7 @@ import { FaSignInAlt, FaSignOutAlt, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { reset, signOut } from "../features/auth/authSlice";
+import { clearTickets } from "../features/tickets/ticketsSlice";
 
 function Header() {
     const navigate = useNavigate();
@@ -12,6 +13,7 @@ function Header() {
     const onLogout = () => {
         dispatch(signOut());
         dispatch(reset());
+        dispatch(clearTickets());
         navigate("/");
     };
 

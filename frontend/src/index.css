@@ -210,7 +210,8 @@ h3 {
 .ticket,
 .ticket-headings {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    overflow-x: auto;
     gap: 20px;
     justify-content: space-between;
     align-items: center;

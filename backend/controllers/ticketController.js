@@ -59,7 +59,7 @@ const updateTicket = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error("Ticket not found");
     }
-    res.status(200).json(updateResult);
+    res.status(200).json({ _id: req.params.id, result: "success update" });
 });
 
 //@route    DELETE /api/tickets/:id
@@ -73,7 +73,7 @@ const deleteTicket = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error("Ticket not found");
     }
-    res.status(200).json(deleteResult);
+    res.status(200).json({ _id: req.params.id, result: "success delete" });
 });
 
 module.exports = {
