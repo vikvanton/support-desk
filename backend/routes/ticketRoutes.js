@@ -16,5 +16,6 @@ router
     .get(protect, getTicket)
     .put(protect, updateTicket)
     .delete(protect, deleteTicket);
+router.use("/:id/notes", require("./noteRoutes"));
 
 module.exports = router;
