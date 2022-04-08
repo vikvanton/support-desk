@@ -1,6 +1,8 @@
-import React, { useLayoutEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { getTickets, reset } from "../features/tickets/ticketsSlice";
+import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
 import TicketItem from "../components/TicketItem";
 import BackButton from "../components/BackButton";
@@ -10,22 +12,22 @@ function Tickets() {
         (state) => state.tickets
     );
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    useLayoutEffect(() => {
-        if (!tickets) {
+    useEffect(() => {
+        if (isError) {
+            toast.error(message);
+            navigate("/");
+        } else if (!tickets) {
             dispatch(getTickets());
         }
         return () => {
             dispatch(reset());
         };
-    }, [dispatch, tickets]);
+    }, [dispatch, isError, message, navigate, tickets]);
 
     if (isLoading) {
         return <Spinner />;
-    }
-
-    if (isError) {
-        return <h3 style={{ color: "red" }}>{message}</h3>;
     }
 
     return (

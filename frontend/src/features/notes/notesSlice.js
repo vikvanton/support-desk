@@ -2,22 +2,38 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import notesService from "./notesService";
 
 const initialState = {
-    notes: [],
+    userNotes: [],
+    ticketNotes: [],
     message: "",
-    isSuccess: false,
     isLoading: false,
+    isSuccess: false,
     isError: false,
 };
 
 export const getNotes = createAsyncThunk(
     "notes/getNotes",
     async (ticketId, thunkAPI) => {
+        const state = thunkAPI.getState();
+        const ticketNotes = state.notes.userNotes.find(
+            (notes) => notes.ticketId === ticketId
+        );
         try {
-            const token = thunkAPI.getState().auth.user.token;
-            return await notesService.getNotes(ticketId, token);
+            if (!ticketNotes) {
+                const token = state.auth.user.token;
+                const response = await notesService.getNotes(ticketId, token);
+                return {
+                    new: true,
+                    result: { ticketId, data: response },
+                };
+            } else {
+                return {
+                    new: false,
+                    result: ticketNotes,
+                };
+            }
         } catch (error) {
             const message =
-                error?.response?.data?.message || "Something went wrong";
+                error?.response?.data?.message || "Unable received notes";
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -28,10 +44,15 @@ export const createNote = createAsyncThunk(
     async ({ noteText, ticketId }, thunkAPI) => {
         try {
             const token = thunkAPI.getState().auth.user.token;
-            return await notesService.createNote(noteText, ticketId, token);
+            const response = await notesService.createNote(
+                noteText,
+                ticketId,
+                token
+            );
+            return { ticketId, data: response };
         } catch (error) {
             const message =
-                error?.response?.data?.message || "Something went wrong";
+                error?.response?.data?.message || "Unable added note";
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -41,7 +62,14 @@ export const notesSlice = createSlice({
     name: "notes",
     initialState,
     reducers: {
-        reset: (state) => initialState,
+        resetNotes: (state) => {
+            state.ticketNotes = [];
+            state.isSuccess = false;
+        },
+        clearNotesError: (state) => {
+            state.message = "";
+            state.isError = false;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -51,7 +79,10 @@ export const notesSlice = createSlice({
             .addCase(getNotes.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                state.notes = action.payload;
+                if (action.payload.new) {
+                    state.userNotes.push(action.payload.result);
+                }
+                state.ticketNotes.push(...action.payload.result.data);
             })
             .addCase(getNotes.rejected, (state, action) => {
                 state.isLoading = false;
@@ -64,7 +95,11 @@ export const notesSlice = createSlice({
             .addCase(createNote.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-                state.notes.push(action.payload);
+                const index = state.userNotes.findIndex(
+                    (notes) => notes.ticketId === action.payload.ticketId
+                );
+                state.userNotes[index].data.push(action.payload.data);
+                state.ticketNotes.push(action.payload.data);
             })
             .addCase(createNote.rejected, (state, action) => {
                 state.isLoading = false;
@@ -74,5 +109,5 @@ export const notesSlice = createSlice({
     },
 });
 
-export const { reset } = notesSlice.actions;
+export const { resetNotes, clearNotesError } = notesSlice.actions;
 export default notesSlice.reducer;
