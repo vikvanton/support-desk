@@ -18,7 +18,7 @@ export const createTicket = createAsyncThunk(
             return await ticketService.createTicket(ticketData, token);
         } catch (error) {
             const message =
-                error?.response?.data?.message || "Unable created ticket";
+                error?.response?.data?.message || "Unable create ticket";
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -32,7 +32,7 @@ export const getTickets = createAsyncThunk(
             return await ticketService.getTickets(token);
         } catch (error) {
             const message =
-                error?.response?.data?.message || "Unable received tickets";
+                error?.response?.data?.message || "Unable receive tickets";
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -46,7 +46,7 @@ export const closeTicket = createAsyncThunk(
             return await ticketService.closeTicket(ticketId, token);
         } catch (error) {
             const message =
-                error?.response?.data?.message || "Unable closed ticket";
+                error?.response?.data?.message || "Unable close ticket";
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -66,6 +66,13 @@ export const ticketsSlice = createSlice({
         receiveTicket: (state, action) => {
             state.ticket = state.tickets.find(
                 (ticket) => ticket._id === action.payload
+            );
+        },
+        updateTicketStatus: (state, action) => {
+            state.tickets.map((ticket) =>
+                ticket._id === action.payload.ticketId
+                    ? (ticket.status = action.payload.status)
+                    : ticket
             );
         },
         clearTickets: (state) => {
@@ -122,5 +129,6 @@ export const ticketsSlice = createSlice({
     },
 });
 
-export const { reset, receiveTicket, clearTickets } = ticketsSlice.actions;
+export const { reset, receiveTicket, updateTicketStatus, clearTickets } =
+    ticketsSlice.actions;
 export default ticketsSlice.reducer;

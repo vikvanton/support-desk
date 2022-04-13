@@ -2,8 +2,10 @@ import React from "react";
 import { FaSignInAlt, FaSignOutAlt, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { reset, signOut } from "../features/auth/authSlice";
+import { signOut } from "../features/auth/authSlice";
 import { clearTickets } from "../features/tickets/ticketsSlice";
+import { clearUserNotes } from "../features/notes/notesSlice";
+import { closeSocket } from "../app/socket";
 
 function Header() {
     const navigate = useNavigate();
@@ -11,9 +13,10 @@ function Header() {
     const { user } = useSelector((state) => state.auth);
 
     const onLogout = () => {
+        closeSocket(user._id);
         dispatch(signOut());
-        dispatch(reset());
         dispatch(clearTickets());
+        dispatch(clearUserNotes());
         navigate("/");
     };
 

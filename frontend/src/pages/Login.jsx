@@ -1,13 +1,14 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaSignInAlt } from "react-icons/fa";
+import { FaSignInAlt, FaEye } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
 import { signInOrUp, reset } from "../features/auth/authSlice";
 import Spinner from "../components/Spinner";
 
 function Login() {
+    const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -16,7 +17,7 @@ function Login() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { user, isLoading, isError, isSuccess, message } = useSelector(
+    const { isLoading, isError, isSuccess, message } = useSelector(
         (state) => state.auth
     );
 
@@ -69,20 +70,35 @@ function Login() {
                             value={formData.email}
                             onChange={onChange}
                             placeholder="Enter your email"
+                            autoComplete="user-email"
                             required
                         />
                     </div>
-                    <div className="form-group">
+                    <div className="form-group passwordInputDiv">
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             className="form-control"
                             id="password"
                             name="password"
                             value={formData.password}
                             onChange={onChange}
                             placeholder="Enter your password"
+                            autoComplete="current-password"
                             required
                         />
+                        {formData.password && (
+                            <span
+                                className="showPassword"
+                                title={`${
+                                    showPassword ? "Hide" : "Show"
+                                } Password`}
+                                onClick={() =>
+                                    setShowPassword((prevState) => !prevState)
+                                }
+                            >
+                                <FaEye size={20} />
+                            </span>
+                        )}
                     </div>
                     <div className="form-group">
                         <button className="btn btn-block">Submit</button>

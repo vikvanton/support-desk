@@ -34,6 +34,18 @@ h3 {
     margin-bottom: 10px;
 }
 
+.passwordInputDiv {
+    position: relative;
+}
+
+.showPassword {
+    cursor: pointer;
+    position: absolute;
+    top: -9%;
+    right: 1%;
+    padding: 1rem;
+}
+
 .container {
     width: 100%;
     max-width: 960px;

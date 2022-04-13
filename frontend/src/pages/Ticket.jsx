@@ -20,9 +20,8 @@ import NoteItem from "../components/NoteItem";
 import NoteModal from "../components/NoteModal";
 
 function Ticket() {
-    const { ticket, isLoading, isSuccess, isError, message } = useSelector(
-        (state) => state.tickets
-    );
+    const { tickets, ticket, isLoading, isSuccess, isError, message } =
+        useSelector((state) => state.tickets);
     const {
         ticketNotes,
         isLoading: notesIsLoading,
@@ -40,15 +39,17 @@ function Ticket() {
         } else if (isError) {
             toast.error(message);
             navigate("/tickets");
-        } else {
+        } else if (tickets) {
             dispatch(receiveTicket(ticketId));
             dispatch(getNotes(ticketId));
+        } else {
+            navigate("/");
         }
         return () => {
             dispatch(reset());
             dispatch(resetNotes());
         };
-    }, [dispatch, isError, isSuccess, message, navigate, ticketId]);
+    }, [dispatch, isError, isSuccess, message, navigate, ticketId, tickets]);
 
     const onTicketClosed = () => {
         dispatch(closeTicket(ticketId));

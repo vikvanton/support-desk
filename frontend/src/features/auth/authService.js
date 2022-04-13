@@ -13,7 +13,9 @@ const signInOrUp = async (userData) => {
     return response.data;
 };
 
-const signOut = () => localStorage.removeItem("user");
+const signOut = () => {
+    localStorage.removeItem("user");
+};
 
 const authService = {
     signInOrUp,

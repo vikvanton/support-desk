@@ -6,11 +6,13 @@ import { toast } from "react-toastify";
 import Spinner from "../components/Spinner";
 import TicketItem from "../components/TicketItem";
 import BackButton from "../components/BackButton";
+import { connectSocket } from "../app/socket";
 
 function Tickets() {
     const { tickets, isLoading, isError, message } = useSelector(
         (state) => state.tickets
     );
+    const { user } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -20,11 +22,12 @@ function Tickets() {
             navigate("/");
         } else if (!tickets) {
             dispatch(getTickets());
+            connectSocket(user._id);
         }
         return () => {
             dispatch(reset());
         };
-    }, [dispatch, isError, message, navigate, tickets]);
+    }, [dispatch, isError, message, navigate, tickets, user._id]);
 
     if (isLoading) {
         return <Spinner />;

@@ -18,7 +18,7 @@ export const signInOrUp = createAsyncThunk(
             return await authService.signInOrUp(userData);
         } catch (error) {
             const message =
-                error?.response?.data?.message || "Something went wrong";
+                error?.response?.data?.message || "Unable log in/up";
             return thunkAPI.rejectWithValue(message);
         }
     }

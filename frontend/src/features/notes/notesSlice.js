@@ -33,7 +33,7 @@ export const getNotes = createAsyncThunk(
             }
         } catch (error) {
             const message =
-                error?.response?.data?.message || "Unable received notes";
+                error?.response?.data?.message || "Unable receive notes";
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -41,19 +41,23 @@ export const getNotes = createAsyncThunk(
 
 export const createNote = createAsyncThunk(
     "notes/createNote",
-    async ({ noteText, ticketId }, thunkAPI) => {
-        try {
-            const token = thunkAPI.getState().auth.user.token;
-            const response = await notesService.createNote(
-                noteText,
-                ticketId,
-                token
-            );
-            return { ticketId, data: response };
-        } catch (error) {
-            const message =
-                error?.response?.data?.message || "Unable added note";
-            return thunkAPI.rejectWithValue(message);
+    async ({ noteText, ticketId, newNote }, thunkAPI) => {
+        if (newNote) {
+            return newNote;
+        } else {
+            try {
+                const token = thunkAPI.getState().auth.user.token;
+                const response = await notesService.createNote(
+                    noteText,
+                    ticketId,
+                    token
+                );
+                return response;
+            } catch (error) {
+                const message =
+                    error?.response?.data?.message || "Unable add note";
+                return thunkAPI.rejectWithValue(message);
+            }
         }
     }
 );
@@ -69,6 +73,9 @@ export const notesSlice = createSlice({
         clearNotesError: (state) => {
             state.message = "";
             state.isError = false;
+        },
+        clearUserNotes: (state) => {
+            state.userNotes = [];
         },
     },
     extraReducers: (builder) => {
@@ -96,10 +103,14 @@ export const notesSlice = createSlice({
                 state.isLoading = false;
                 state.isSuccess = true;
                 const index = state.userNotes.findIndex(
-                    (notes) => notes.ticketId === action.payload.ticketId
+                    (notes) => notes.ticketId === action.payload.ticket
                 );
-                state.userNotes[index].data.push(action.payload.data);
-                state.ticketNotes.push(action.payload.data);
+                if (index !== -1) {
+                    state.userNotes[index].data.push(action.payload);
+                    if (state.ticketNotes.length > 0) {
+                        state.ticketNotes.push(action.payload);
+                    }
+                }
             })
             .addCase(createNote.rejected, (state, action) => {
                 state.isLoading = false;
@@ -109,5 +120,6 @@ export const notesSlice = createSlice({
     },
 });
 
-export const { resetNotes, clearNotesError } = notesSlice.actions;
+export const { resetNotes, clearNotesError, clearUserNotes } =
+    notesSlice.actions;
 export default notesSlice.reducer;
